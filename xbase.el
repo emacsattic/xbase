@@ -205,6 +205,24 @@
       (error "%s is not a valid indent rule" rule-name))))
 
 (defun xbase-add-rule (name regexp opening-rule closing-rule &optional offset subsequent-offset)
+  "Add a new rule to xbase-mode's identation rules.
+
+NAME is a symbol that is the name of the rule.
+REGEXP is a regular expression for checking a line matches the rule.
+OPENING-RULE is the name of a rule that is the opening for this line type.
+CLOSING-RULE is the name of a rule that is the closing for this line type.
+OFFSET is an optional offset value for indenting a line matching this rule.
+SUBSEQUENT-OFFSET is an optional offset value for indenting subsequent lines.
+
+Example:
+
+If you write your Xbase code so that you only have one RETURN statement in a
+function or procedure and you want the RETURN statement to be indented to
+the 0th column you could use this function to add such a rule:
+
+  (xbase-add-rule 'xbase-return \"^[\\t ]*return\" 'xbase-defun nil 0)
+
+Calling this function updates `xbase-indent-rules'."
   (unless (xbase-rule name)
     (nconc xbase-indent-rules (list (list name regexp opening-rule closing-rule offset subsequent-offset)))))
 
@@ -400,7 +418,7 @@ Note: WHOLE-EXP is currently ignored."
   (let ((map (make-sparse-keymap)))
     (define-key map [(control c) (control l)] #'xbase-describe-line)
     map)
-    "Keymap used in `xbase-mode'.")
+  "Keymap used in `xbase-mode'.")
 
 ;; xbase-mode non-customizable variables.
 
@@ -411,7 +429,7 @@ Note: WHOLE-EXP is currently ignored."
     (modify-syntax-entry ?\' "\""     st) ; "'" is a string delimiter.
     (modify-syntax-entry ?/  ". 124b" st) ; Enable "//" and "/**/" comments.
     (modify-syntax-entry ?*  ". 23"   st) ; Ditto.
-    (modify-syntax-entry ?&  ". 12b"  st) ; Enable "&&" commands.
+    (modify-syntax-entry ?&  ". 12b"  st) ; Enable "&&" comments.
     (modify-syntax-entry ?\n "> b"    st) ; New line ends "//" and "&&" comments.
     st)
   "`xbase-mode' syntax table.")
