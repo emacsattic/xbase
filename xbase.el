@@ -27,6 +27,8 @@
 ;; o Fix all bugs.
 ;;
 ;; o Fully document.
+;;
+;; o Add OO oriented indentation support.
 
 ;;; INSTALLATION:
 ;;
@@ -339,6 +341,7 @@ Note: WHOLE-EXP is currently ignored."
   '("announce"
     "begin" "sequence" "break" "recover" "using" "end" "sequence"
     "declare"
+    "default"
     "do"
     "case" "otherwise" "endcase"
     "while" "exit" "loop" "enddo"
@@ -347,6 +350,7 @@ Note: WHOLE-EXP is currently ignored."
     "external"
     "for" "to" "step" "next"
     "static" "function" "local" "static"
+    "create" "class" "inherit" "from" "method" "access" "assign" "endclass"
     "if" "else" "elseif" "endif"
     "init"
     "parameters"
@@ -392,7 +396,17 @@ Note: WHOLE-EXP is currently ignored."
 
 (defcustom xbase-function-name-face 'font-lock-function-name-face
   "*Face to use for function names."
-  :type 'face
+  :type  'face
+  :group 'xbase)
+
+(defcustom xbase-variable-name-face 'font-lock-variable-name-face
+  "*Face to use for variable names."
+  :type  'face
+  :group 'xbase)
+
+(defcustom xbase-constant-face 'font-lock-constant-face
+  "*Face to use for constants."
+  :type  'face
   :group 'xbase)
 
 ;; xbase-mode code.
@@ -430,7 +444,15 @@ Special commands:
                                ;; Now for some "hard wired" rules.
                                
                                ;; "defun" function names.
-                               (list "\\<\\(function\\|procedure\\)\\>\\s-\\<\\(\\w*\\)\\>" 2 xbase-function-name-face))
+                               (list "\\<\\(function\\|procedure\\|method\\|access\\|assign\\|class\\|inherit\\|from\\)\\>\\s-\\<\\(\\w*\\)\\>" 2 xbase-function-name-face)
+
+                               ;; #define constant name.
+                               (list "#[ \t]*define[ \t]+\\(\\sw+\\)" 1 xbase-variable-name-face)
+
+                               ;; Common constants.
+                               (list "\\(\\.\\(f\\|\\t\\)\\.\\|\\<\\(nil\\|self\\|super\\)\\>\\)" 0 xbase-constant-face)
+
+                               )
                               nil t))
   (set-syntax-table xbase-mode-syntax-table)
   (run-hooks 'xbase-mode-hook))

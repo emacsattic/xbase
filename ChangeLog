@@ -1,3 +1,15 @@
+2002-05-22 14:55 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-font-lock-statements): Added various OO oriented
+	statements. Added DEFAULT.
+
+2002-05-22 14:37 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-variable-name-face): Added.
+	(xbase-constant-face): Added.
+	(xbase-mode): Reenabled font locking for #define names. Reenabled
+	font locking for .T., .F. and NIL. Also included SELF and SUPER.
+
 2002-05-22 13:48 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-mode-syntax-table): Added support for "&&"
