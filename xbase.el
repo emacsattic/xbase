@@ -142,69 +142,68 @@ rigidly along with this one (not yet)."
   (xbase-find-matching-stmt xbase-for-regexp xbase-next-regexp))
 
 (defun xbase-indent-level ()
-  (let ((original-point (point)))
-    (save-excursion
-      (beginning-of-line)
-      ;; Some cases depend only on where we are now.
-      (cond ((looking-at xbase-defun-start-regexp)
-             0)
-
-            ;; The outdenting stmts, which simply match their original.
-            ((or (looking-at xbase-else-regexp)
-                 (looking-at xbase-endif-regexp))
-             (message "else,endif")
-             (xbase-find-matching-if)
-             (current-indentation))
-
-            ;; All the other matching pairs act alike.
-            ((looking-at xbase-next-regexp) ; for/next
-             (xbase-find-matching-for)
-             (current-indentation))
-
-            ((looking-at xbase-wend-regexp) ; while/wend
-             (xbase-find-matching-while)
-             (current-indentation))
-
-            ((looking-at xbase-select-end-regexp) ; select case/end select
-             (xbase-find-matching-select)
-             (current-indentation))
-
-            ;; A case of a select is somewhat special.
-            ((looking-at xbase-case-regexp)
-             (xbase-find-matching-select)
-             (+ (current-indentation) xbase-mode-indent))
-
-
-            (t
-             ;; Other cases which depend on the previous line.
-             (xbase-previous-line-of-code)
-             (cond
-
-              (t
-               (message "other")
-               (xbase-find-original-statement)
-               (let ((indent (current-indentation)))
-                 ;; All the various +indent regexps.
-                 (cond ((looking-at xbase-defun-start-regexp)
-                        (+ indent xbase-mode-indent))
-
-                       ((or (looking-at xbase-if-regexp)
-                            (looking-at xbase-else-regexp))
-                        (+ indent xbase-mode-indent))
-
-                       ((or (looking-at xbase-select-regexp)
-                            (looking-at xbase-case-regexp))
-                        (+ indent xbase-mode-indent))
-
-                       ((or (looking-at xbase-do-regexp)
-                            (looking-at xbase-for-regexp)
-                            (looking-at xbase-while-regexp)
-                            (looking-at xbase-with-regexp))
-                        (+ indent xbase-mode-indent))
-
-                       (t
-                        ;; By default, just copy indent from prev line.
-                        indent))))))))))
+  (save-excursion
+    (beginning-of-line)
+    ;; Some cases depend only on where we are now.
+    (cond ((looking-at xbase-defun-start-regexp)
+           0)
+          
+          ;; The outdenting stmts, which simply match their original.
+          ((or (looking-at xbase-else-regexp)
+               (looking-at xbase-endif-regexp))
+           (message "else,endif")
+           (xbase-find-matching-if)
+           (current-indentation))
+          
+          ;; All the other matching pairs act alike.
+          ((looking-at xbase-next-regexp) ; for/next
+           (xbase-find-matching-for)
+           (current-indentation))
+          
+          ((looking-at xbase-wend-regexp) ; while/wend
+           (xbase-find-matching-while)
+           (current-indentation))
+          
+          ((looking-at xbase-select-end-regexp) ; select case/end select
+           (xbase-find-matching-select)
+           (current-indentation))
+          
+          ;; A case of a select is somewhat special.
+          ((looking-at xbase-case-regexp)
+           (xbase-find-matching-select)
+           (+ (current-indentation) xbase-mode-indent))
+          
+          
+          (t
+           ;; Other cases which depend on the previous line.
+           (xbase-previous-line-of-code)
+           (cond
+             
+             (t
+              (message "other")
+              (xbase-find-original-statement)
+              (let ((indent (current-indentation)))
+                ;; All the various +indent regexps.
+                (cond ((looking-at xbase-defun-start-regexp)
+                       (+ indent xbase-mode-indent))
+                      
+                      ((or (looking-at xbase-if-regexp)
+                           (looking-at xbase-else-regexp))
+                       (+ indent xbase-mode-indent))
+                      
+                      ((or (looking-at xbase-select-regexp)
+                           (looking-at xbase-case-regexp))
+                       (+ indent xbase-mode-indent))
+                      
+                      ((or (looking-at xbase-do-regexp)
+                           (looking-at xbase-for-regexp)
+                           (looking-at xbase-while-regexp)
+                           (looking-at xbase-with-regexp))
+                       (+ indent xbase-mode-indent))
+                      
+                      (t
+                       ;; By default, just copy indent from prev line.
+                       indent)))))))))
 
 (defvar xbase-mode-hook nil
   "*List of functions to call when enterning xbase mode.")

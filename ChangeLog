@@ -1,3 +1,8 @@
+2002-05-18 12:03 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-indent-level): Removed code that saved `point'
+	it wasn't necessary because `save-excursion' is being used.
+
 2002-05-18 11:39 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-mode): Added autoload marker.
