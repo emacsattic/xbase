@@ -178,7 +178,7 @@
         ((fboundp offset)               ; + and - are used as functions.
          (+ indent (funcall offset xbase-mode-indent)))
         (t
-         (error "'%' is not a valid offset"))))
+         (error "'%s' is not a valid offset"))))
 
 (defun xbase-continuation-line-p ()
   "Is the current line of code a continuation of the previous line?"

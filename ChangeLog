@@ -1,3 +1,8 @@
+2002-05-22 17:52 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-calculate-indent-with-offset): Fixed error
+	message.
+
 2002-05-22 16:58 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-indent-line): Modified to use
