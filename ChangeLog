@@ -1,3 +1,9 @@
+2002-05-20 17:50 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-mode): Removed `make-local-variable' declaration
+	for `xbase-indent-level', no such buffer local variable is
+	required.
+
 2002-05-20 16:12 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-mode): Made sure that `indent-line-function' is

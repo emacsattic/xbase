@@ -286,13 +286,12 @@ rigidly along with this one (not yet)."
   (kill-all-local-variables)
   (use-local-map xbase-mode-map)
   (make-local-variable 'indent-line-function)
+  (make-local-variable 'font-lock-defaults)
   (setq major-mode           'xbase-mode
         mode-name            "Xbase"
-        indent-line-function 'xbase-indent-line)
-  (make-local-variable 'font-lock-defaults)
-  (make-local-variable 'xbase-indent-level)
-  (setq font-lock-defaults '(xbase-font-lock-keywords nil t))
-  (font-lock-mode)
+        indent-line-function 'xbase-indent-line
+        font-lock-defaults '(xbase-font-lock-keywords nil t))
+  (font-lock-mode)                      ; TODO: I don't think this should be turned on here.
   (run-hooks 'xbase-mode-hook))
 
 (provide 'xbase)
