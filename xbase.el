@@ -119,6 +119,7 @@
                   (choice :tag "Extra offset for this statement"
                    (const :tag "Add one extra level of indentation" +)
                    (const :tag "Remove one level of indentation" -)
+                   (const :tag "Remove all indentation" 0)
                    (const :tag "Use the calculated indentation level" nil))
                   (choice :tag "Extra offset for subsequent lines of code"
                    (const :tag "Add one extra level of indentation" +)
