@@ -79,9 +79,9 @@ rigidly along with this one (not yet)."
 
 (defconst xbase-continuation-regexp "^.*\\_[ \t]*$") ; TODO: What is this for?
 
-(defconst xbase-select-regexp "^[ \t]*do[ \t]+case")
+(defconst xbase-do-case-regexp "^[ \t]*do[ \t]+case")
 (defconst xbase-case-regexp "^[ \t]*\\(case\\|otherwise\\)")
-(defconst xbase-select-end-regexp "^[ \t]*endcase")
+(defconst xbase-do-case-end-regexp "^[ \t]*endcase")
 
 (defconst xbase-for-regexp "^[ \t]*for")
 (defconst xbase-next-regexp "^[ \t]*next")
@@ -135,8 +135,8 @@ rigidly along with this one (not yet)."
 (defun xbase-find-matching-if ()
   (xbase-find-matching-stmt xbase-if-regexp xbase-endif-regexp))
 
-(defun xbase-find-matching-select ()
-  (xbase-find-matching-stmt xbase-select-regexp xbase-select-end-regexp))
+(defun xbase-find-matching-do-case ()
+  (xbase-find-matching-stmt xbase-do-case-regexp xbase-do-case-end-regexp))
 
 (defun xbase-find-matching-for ()
   (xbase-find-matching-stmt xbase-for-regexp xbase-next-regexp))
@@ -165,13 +165,13 @@ rigidly along with this one (not yet)."
              (xbase-find-matching-while)
              (current-indentation))
             
-            ((looking-at xbase-select-end-regexp) ; select case/end select
-             (xbase-find-matching-select)
+            ((looking-at xbase-do-case-end-regexp) ; do case/end case
+             (xbase-find-matching-do-case)
              (current-indentation))
             
-            ;; A case of a select is somewhat special.
+            ;; A case of a case is somewhat special.
             ((looking-at xbase-case-regexp)
-             (xbase-find-matching-select)
+             (xbase-find-matching-do-case)
              (+ (current-indentation) xbase-mode-indent))
             
             
@@ -190,7 +190,7 @@ rigidly along with this one (not yet)."
                                  (looking-at xbase-else-regexp))
                              (+ indent xbase-mode-indent))
                             
-                            ((or (looking-at xbase-select-regexp)
+                            ((or (looking-at xbase-do-case-regexp)
                                  (looking-at xbase-case-regexp))
                              (+ indent xbase-mode-indent))
                             

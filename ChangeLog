@@ -1,3 +1,8 @@
+2002-05-20 14:39 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el: Renamed symbols using "select" in their name to
+	"do-case".
+
 2002-05-20 10:13 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-mode): Changed `mode-name' from "xBase" to
