@@ -29,6 +29,8 @@
 ;; o Fully document.
 ;;
 ;; o Add OO oriented indentation support.
+;;
+;; o Provide function for `forward-sexp-function'.
 
 ;;; INSTALLATION:
 ;;
@@ -216,7 +218,7 @@ If OFFSET is `+' or `-' INDENT will be either increased or decreased by
         (open-re          (xbase-rule-opening-regexp rule))
         (close-re         (xbase-rule-closing-regexp rule)))
     (beginning-of-line)
-    (while (and (not (bobp)) (not (zerop level)))
+    (while (not (or (bobp) (zerop level)))
       (xbase-previous-line)
       (cond ((looking-at close-re)
              (incf level))
@@ -407,6 +409,12 @@ Note: WHOLE-EXP is currently ignored."
   :type  '(repeat string)
   :group 'xbase)
 
+(defcustom xbase-font-lock-logic
+  '("and" "or" "not")
+  "*Xbase logic operators for font locking."
+  :type  '(repeat string)
+  :group 'xbase)
+
 (defcustom xbase-font-lock-commands
   '("text" "endtext")                   ; TODO: Lots more to add.
   "*Xbase commands for font locking."
@@ -443,6 +451,11 @@ Note: WHOLE-EXP is currently ignored."
   :type  'face
   :group 'xbase)
 
+(defcustom xbase-logic-face 'font-lock-builtin-face
+  "*Face to use for logic operators"
+  :type  'face
+  :group 'xbase)
+
 ;; xbase-mode code.
 
 (defun xbase-end-of-defun ()
@@ -452,7 +465,8 @@ Note: WHOLE-EXP is currently ignored."
     (when (defunp)                      ; If we're on the start of a function.
       (forward-line 1))                 ; Skip forward a line.
     ;; Look for the start of another function or the end of the buffer.
-    (loop while (and (not (eobp)) (not (defunp))) do (forward-line 1))
+    (while (not (or (eobp) (defunp)))
+      (forward-line 1))
     ;; If we're on a defun, back up one line.
     (when (defunp)
       (forward-line -1))))
@@ -490,6 +504,9 @@ Special commands:
                                 
                                 ;; User configurable list of commands.
                                 (list (regexp-opt xbase-font-lock-commands 'words) 1 xbase-command-face)
+
+                                ;; User configurable list of logic operators
+                                (list (concat "\\." (regexp-opt xbase-font-lock-logic 'words) "\\.") 1 xbase-logic-face)
                                 
                                 ;; Now for some "hard wired" rules.
                                
@@ -500,7 +517,7 @@ Special commands:
                                 (list "#[ \t]*define[ \t]+\\(\\sw+\\)" 1 xbase-variable-name-face)
                                 
                                 ;; Common constants.
-                               (list "\\(\\.\\(f\\|\\t\\)\\.\\|\\<\\(nil\\|self\\|super\\)\\>\\)" 0 xbase-constant-face)
+                                (list "\\(\\.\\(f\\|\\t\\)\\.\\|\\<\\(nil\\|self\\|super\\)\\>\\)" 0 xbase-constant-face)
                                
                                )
                                nil t))

@@ -1,3 +1,19 @@
+2002-05-24 09:46 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-find-matching-statement): Simplified the test of
+	the `while'.
+
+2002-05-24 09:41 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-font-lock-logic): Added.
+	(xbase-logic-face): Added.
+	(xbase-mode): Added logic operators to the font lock defaults.
+
+2002-05-24 09:33 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-end-of-defun): Don't `loop' when `while' will
+	do.
+
 2002-05-23 10:32 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-end-of-defun): Added.
