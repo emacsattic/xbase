@@ -320,9 +320,17 @@ Note: WHOLE-EXP is currently ignored."
     map)
     "Keymap used in `xbase-mode'.")
 
-;; xbase-mode constants
+;; xbase-mode non-customizable variables.
 
-(defconst xbase-mode-syntax-table (make-syntax-table) ; TODO: What am I going to do with this?
+(defvar xbase-mode-syntax-table
+  (let ((st (make-syntax-table)))
+    (modify-syntax-entry ?_  "w"      st)
+    (modify-syntax-entry ?\' "\""     st) ; "'" is a string delimiter.
+    (modify-syntax-entry ?/  ". 124b" st) ; Enable "//" and "/**/" comments.
+    (modify-syntax-entry ?*  ". 23"   st) ; Ditto.
+    (modify-syntax-entry ?&  ". 12b"  st) ; Enable "&&" commands.
+    (modify-syntax-entry ?\n "> b"    st) ; New line ends "//" and "&&" comments.
+    st)
   "`xbase-mode' syntax table.")
 
 ;; xbase-mode font lock customize options.
@@ -369,22 +377,22 @@ Note: WHOLE-EXP is currently ignored."
 
 (defcustom xbase-keyword-face 'font-lock-keyword-face
   "*Face to use for Xbase keywords."
-  :type  'facep
+  :type  'face
   :group 'xbase)
 
 (defcustom xbase-directive-face 'font-lock-keyword-face
   "*Face to use for Xbase pre-processor directives."
-  :type  'facep
+  :type  'face
   :group 'xbase)
 
 (defcustom xbase-command-face 'font-lock-keyword-face
   "*Face to use for Xbase commands."
-  :type  'facep
+  :type  'face
   :group 'xbase)
 
-(defcustom xbase-string-face 'font-lock-string-face
-  "*Face to use for strings."
-  :type  'facep
+(defcustom xbase-function-name-face 'font-lock-function-name-face
+  "*Face to use for function names."
+  :type 'face
   :group 'xbase)
 
 ;; xbase-mode code.
@@ -406,15 +414,23 @@ Special commands:
         indent-line-function 'xbase-indent-line
         font-lock-defaults   (list
                               (list
-                               ;; Statements
-                               (list (regexp-opt xbase-font-lock-statements 'words) 1 xbase-keyword-face t)
-                               ;; Pre-processor directives.
-                               (list (concat "#" (regexp-opt xbase-font-lock-directives 'words)) 1 xbase-directive-face t)
-                               ;; Commands.
-                               (list (regexp-opt xbase-font-lock-commands 'words) 1 xbase-command-face t)
-                               ;; Strings (note that [] strings are not supported).
-                               (list "\"[^\n]\"" 0 xbase-string-face)
-                               (list "\'[^\n]\'" 0 xbase-string-face))
+
+                               ;; The first few entries deal with lists that
+                               ;; the user can configure.
+                               
+                               ;; User configurable list of statements.
+                               (list (regexp-opt xbase-font-lock-statements 'words) 1 xbase-keyword-face)
+                               
+                               ;; User configurable list of pre-processor directives.
+                               (list (concat "#" (regexp-opt xbase-font-lock-directives 'words)) 1 xbase-directive-face)
+                               
+                               ;; user configurable list of commands.
+                               (list (regexp-opt xbase-font-lock-commands 'words) 1 xbase-command-face)
+
+                               ;; Now for some "hard wired" rules.
+                               
+                               ;; "defun" function names.
+                               (list "\\<\\(function\\|procedure\\)\\>\\s-\\<\\(\\w*\\)\\>" 2 xbase-function-name-face))
                               nil t))
   (set-syntax-table xbase-mode-syntax-table)
   (run-hooks 'xbase-mode-hook))

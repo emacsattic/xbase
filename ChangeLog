@@ -1,3 +1,44 @@
+2002-05-22 13:48 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-mode-syntax-table): Added support for "&&"
+	comments.
+
+2002-05-22 13:37 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-mode-syntax-table): Changed to a `defvar' (was a
+	`defconst').
+
+2002-05-22 13:36 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-mode-syntax-table): Set "_" to word class.
+	Added support for "/* .. */" and "//" comments.
+
+2002-05-22 13:31 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-mode-syntax-table): Set "'" to be a string
+	delimiter.
+
+2002-05-22 13:30 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-string-face): Removed.
+	(xbase-mode): Removed string entry from font lock rules, it's not
+	required.
+
+2002-05-22 12:49 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-function-name-face): Added.
+	(xbase-mode): Reenabled highlighting of (defun) function names.
+
+2002-05-22 12:47 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-*-face): Fixed invalid :type settings. They
+	should have been `face' but I'd used `facep'.
+
+2002-05-22 12:33 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-mode): Statements, directives and commands were
+	being highlighted when they were part of a string. Fixed.
+
 2002-05-22 12:02 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-keyword-face): Added.
