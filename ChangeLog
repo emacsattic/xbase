@@ -1,3 +1,18 @@
+2002-05-22 12:02 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-keyword-face): Added.
+	(xbase-directive-face): Added.
+	(xbase-command-face): Added.
+	(xbase-string-face): Added.
+	(xbase-mode): Put font lock support for strings back in. Used the
+	above variables to control which faces are used for the various
+	font locking rules. Made full use of `regexp-opt' by getting it to
+	place the word markers in the resulting regular expression.
+	(xbase-font-lock-directives): Removed the preceeding "#" from each
+	entry in the list.
+	(xbase-mode): Added the "#" to the start of the use of
+	`xbase-font-lock-directives' when setting up the font lock rules.
+
 2002-05-22 10:55 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-some-statement-indentation): Modified to handle

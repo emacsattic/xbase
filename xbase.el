@@ -350,13 +350,13 @@ Note: WHOLE-EXP is currently ignored."
   :group 'xbase)
 
 (defcustom xbase-font-lock-directives
-  '("#command" "#xcommand" "#translate" "#xtranslate"
-    "#define"
-    "#error"
-    "#ifdef" "#ifndef" "#else" "#endif"
-    "#include"
-    "#stdout"
-    "#undef")
+  '("command" "xcommand" "translate" "xtranslate"
+    "define"
+    "error"
+    "ifdef" "ifndef" "else" "endif"
+    "include"
+    "stdout"
+    "undef")
   "*Xbase directives for font locking."
   :type  '(repeat string)
   :group 'xbase)
@@ -365,6 +365,26 @@ Note: WHOLE-EXP is currently ignored."
   '("text" "endtext")                   ; TODO: Lots more to add.
   "*Xbase commands for font locking."
   :type  '(repeat string)
+  :group 'xbase)
+
+(defcustom xbase-keyword-face 'font-lock-keyword-face
+  "*Face to use for Xbase keywords."
+  :type  'facep
+  :group 'xbase)
+
+(defcustom xbase-directive-face 'font-lock-keyword-face
+  "*Face to use for Xbase pre-processor directives."
+  :type  'facep
+  :group 'xbase)
+
+(defcustom xbase-command-face 'font-lock-keyword-face
+  "*Face to use for Xbase commands."
+  :type  'facep
+  :group 'xbase)
+
+(defcustom xbase-string-face 'font-lock-string-face
+  "*Face to use for strings."
+  :type  'facep
   :group 'xbase)
 
 ;; xbase-mode code.
@@ -384,13 +404,18 @@ Special commands:
   (setq major-mode           'xbase-mode
         mode-name            "Xbase"
         indent-line-function 'xbase-indent-line
-        font-lock-defaults   (list (list (list (concat "\\<\\(" (regexp-opt xbase-font-lock-statements) "\\)\\>")
-                                               1 font-lock-keyword-face t)
-                                         (list (concat "\\<\\(" (regexp-opt xbase-font-lock-directives) "\\)\\>")
-                                               1 font-lock-constant-face t)
-                                         (list (concat "\\<\\(" (regexp-opt xbase-font-lock-commands) "\\)\\>")
-                                               1 font-lock-constant-face t))
-                                   t t nil nil))
+        font-lock-defaults   (list
+                              (list
+                               ;; Statements
+                               (list (regexp-opt xbase-font-lock-statements 'words) 1 xbase-keyword-face t)
+                               ;; Pre-processor directives.
+                               (list (concat "#" (regexp-opt xbase-font-lock-directives 'words)) 1 xbase-directive-face t)
+                               ;; Commands.
+                               (list (regexp-opt xbase-font-lock-commands 'words) 1 xbase-command-face t)
+                               ;; Strings (note that [] strings are not supported).
+                               (list "\"[^\n]\"" 0 xbase-string-face)
+                               (list "\'[^\n]\'" 0 xbase-string-face))
+                              nil t))
   (set-syntax-table xbase-mode-syntax-table)
   (run-hooks 'xbase-mode-hook))
   
