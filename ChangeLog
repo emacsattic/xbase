@@ -1,3 +1,9 @@
+2002-05-27 11:48 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-end-of-defun): Renamed `is-defun-p' back to
+	`defunp' now that I've had a fix from RMS for the indentation
+	problem.
+
 2002-05-24 18:07 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el: Added joint copyright.
