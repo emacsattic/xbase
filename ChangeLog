@@ -1,3 +1,15 @@
+2002-05-22 10:55 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-some-statement-indentation): Modified to handle
+	cases where there is nothing to match to. Now, when there is
+	nothing to be matched for finding the previous indentation level
+	the current level is used.
+
+2002-05-22 10:47 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-indent-rules): STATIC/INIT/EXIT functions and
+	procedures are now catered for.
+
 2002-05-22 10:18 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-font-lock-commands): Added.

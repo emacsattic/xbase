@@ -15,11 +15,18 @@
 
 ;;; BUGS:
 ;;
+;; o The indentation code is easily confused by multi-statement lines. For
+;;   example, this code:
 ;;
+;;      For n := 1 To 10; Next
+;;
+;;   will look like an unclosed For...Next loop.
 
 ;;; TODO:
 ;;
+;; o Fix all bugs.
 ;;
+;; o Fully document.
 
 ;;; INSTALLATION:
 ;;
@@ -70,7 +77,7 @@
     (xbase-end-sequence   "^[\t ]*end[\t ]+sequence"                                  xbase-begin-sequence nil                nil      nil)
     (xbase-text           "^[\t ]*text"                                               nil                  xbase-endtext      nil      0)
     (xbase-endtext        "^[\t ]*endtext"                                            xbase-text           nil                nil      nil)
-    (xbase-defun          "^[\t ]*\\(procedure\\|function\\)[\t ]+\\(\\w+\\)[\t ]*(?" xbase-defun          xbase-defun        nil      nil)
+    (xbase-defun          "^[\t ]*\\(static\\|init\\|exit\\)?[\t ]*\\(procedure\\|function\\)[\t ]+\\(\\w+\\)[\t ]*(?" xbase-defun xbase-defun nil nil)
     (xbase-local          "^[\t ]*local"                                              xbase-defun          xbase-defun        nil      nil))
   "*Rules for indenting Xbase code."
   :type '(repeat (list    :tag "Indentation rule"
@@ -239,10 +246,15 @@
 
 (defun xbase-some-statement-indentation (statement-type)
   (save-excursion
-    (xbase-previous-line)
-    (let ((match (funcall statement-type)))
-      (message "Matched to %s" (xbase-rule-name match))
-      (xbase-calculate-indent-with-offset (current-indentation) (xbase-rule-subsequent-offset match)))))
+    (let ((match (unless (bobp)
+                   (xbase-previous-line)
+                   (funcall statement-type))))
+      (cond (match
+             (message "Matched to %s" (xbase-rule-name match))
+             (xbase-calculate-indent-with-offset (current-indentation) (xbase-rule-subsequent-offset match)))
+            (t
+             (message "No matches found")
+             (- xbase-mode-indent))))))
 
 (defun xbase-previous-opening-statement-indentation ()
   (xbase-some-statement-indentation #'xbase-find-opening-statement-backward))
