@@ -53,7 +53,7 @@ With argument, indent any additional lines of the same clause
 rigidly along with this one (not yet)."
   (interactive "p")
   (let ((indent (xbase-indent-level))
-	(pos (- (point-max) (point)))
+        (pos (- (point-max) (point)))
         (beg (progn
                (beginning-of-line)
                (point))))
@@ -62,7 +62,7 @@ rigidly along with this one (not yet)."
       (delete-region beg (point))
       (indent-to indent))
     (if (> (- (point-max) pos) (point))
-	(goto-char (- (point-max) pos)))))
+        (goto-char (- (point-max) pos)))))
 
 (defconst xbase-defun-start-regexp
   "^[ \t]*\\([Pp]rocedure\\|[Ff]unction\\)[ \t]+\\(\\w+\\)[ \t]*(?")
@@ -104,10 +104,10 @@ rigidly along with this one (not yet)."
 
 (defun xbase-previous-line-of-code ()
   (if (not (bobp))
-      (forward-line -1))	; previous-line depends on goal column
+      (forward-line -1))        ; previous-line depends on goal column
   (while (and (not (bobp))
-	      (or (looking-at xbase-blank-regexp)
-		  (looking-at xbase-comment-regexp)))
+              (or (looking-at xbase-blank-regexp)
+                  (looking-at xbase-comment-regexp)))
     (forward-line -1)))
 
 (defun xbase-find-original-statement ()
@@ -116,7 +116,7 @@ rigidly along with this one (not yet)."
   (let ((here (point)))
     (xbase-previous-line-of-code)
     (while (and (not (bobp))
-		(looking-at xbase-continuation-regexp))
+                (looking-at xbase-continuation-regexp))
       (setq here (point))
       (xbase-previous-line-of-code))
     (goto-char here)))
@@ -128,9 +128,9 @@ rigidly along with this one (not yet)."
       (xbase-previous-line-of-code)
       (xbase-find-original-statement)
       (cond ((looking-at close-regexp)
-	     (setq level (+ level 1)))
-	    ((looking-at open-regexp)
-	     (setq level (- level 1)))))))
+             (setq level (+ level 1)))
+            ((looking-at open-regexp)
+             (setq level (- level 1)))))))
 
 (defun xbase-find-matching-if ()
   (xbase-find-matching-stmt xbase-if-regexp xbase-endif-regexp))
@@ -149,35 +149,35 @@ rigidly along with this one (not yet)."
       (cond ((looking-at xbase-defun-start-regexp)
              0)
 
-	    ;; The outdenting stmts, which simply match their original.
-	    ((or (looking-at xbase-else-regexp)
-		 (looking-at xbase-endif-regexp))
+            ;; The outdenting stmts, which simply match their original.
+            ((or (looking-at xbase-else-regexp)
+                 (looking-at xbase-endif-regexp))
              (message "else,endif")
-	     (xbase-find-matching-if)
-	     (current-indentation))
+             (xbase-find-matching-if)
+             (current-indentation))
 
-	    ;; All the other matching pairs act alike.
-	    ((looking-at xbase-next-regexp) ; for/next
-	     (xbase-find-matching-for)
-	     (current-indentation))
+            ;; All the other matching pairs act alike.
+            ((looking-at xbase-next-regexp) ; for/next
+             (xbase-find-matching-for)
+             (current-indentation))
 
-	    ((looking-at xbase-wend-regexp) ; while/wend
-	     (xbase-find-matching-while)
-	     (current-indentation))
+            ((looking-at xbase-wend-regexp) ; while/wend
+             (xbase-find-matching-while)
+             (current-indentation))
 
-	    ((looking-at xbase-select-end-regexp) ; select case/end select
-	     (xbase-find-matching-select)
-	     (current-indentation))
+            ((looking-at xbase-select-end-regexp) ; select case/end select
+             (xbase-find-matching-select)
+             (current-indentation))
 
-	    ;; A case of a select is somewhat special.
-	    ((looking-at xbase-case-regexp)
-	     (xbase-find-matching-select)
-	     (+ (current-indentation) xbase-mode-indent))
+            ;; A case of a select is somewhat special.
+            ((looking-at xbase-case-regexp)
+             (xbase-find-matching-select)
+             (+ (current-indentation) xbase-mode-indent))
 
 
-	    (t
-	     ;; Other cases which depend on the previous line.
-	     (xbase-previous-line-of-code)
+            (t
+             ;; Other cases which depend on the previous line.
+             (xbase-previous-line-of-code)
              (cond
 
               (t
@@ -211,7 +211,7 @@ rigidly along with this one (not yet)."
 
 (defvar xbase-mode-map
   (let ((map (make-sparse-keymap))
-	(menu-map (make-sparse-keymap "Insert")))
+        (menu-map (make-sparse-keymap "Insert")))
     (define-key map "\t" 'xbase-indent-line)
     map)
     "Keymap for xbase major mode.")
@@ -241,9 +241,9 @@ rigidly along with this one (not yet)."
 ;; font-lock-keyword-face "Face name to use for keywords.")
 ;; font-lock-builtin-face "Face name to use for builtins.")
 ;; font-lock-variable-name-face "Face name to use for variable names.")
-;; font-lock-type-face	     "Face name to use for type and class names.")
+;; font-lock-type-face       "Face name to use for type and class names.")
 ;; font-lock-constant-face   "Face name to use for constant and label names.")
-;; font-lock-warning-face	  "Face name to use for things that should stand out.")
+;; font-lock-warning-face         "Face name to use for things that should stand out.")
 ;; font-lock-reference-face  "This variable is obsolete.  Use font-lock-constant-face.")
 
 (defvar xbase-font-lock-keywords
