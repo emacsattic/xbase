@@ -12,7 +12,7 @@
 
 ;;; THANKS:
 ;;
-;; 
+;;
 
 ;;; BUGS:
 ;;
@@ -32,6 +32,9 @@
 ;; o Add OO oriented indentation support.
 ;;
 ;; o Provide function for `forward-sexp-function'.
+;;
+;; o Pre-processor indentation is a bit of a kludge. Actually, I'm starting
+;;   to wonder if the indentation "engine" could do with a total overhaul.
 
 ;;; INSTALLATION:
 ;;
@@ -65,25 +68,28 @@
   :group 'xbase)
 
 (defcustom xbase-indent-rules
-;;   Rule Name            RegExp                                                      Opening Rule         Closing Rule       Offset   Subsequent Offset
-  '((xbase-if             "^[\t ]*#?if"                                               nil                  xbase-endif        nil      nil)
-    (xbase-else           "^[\t ]*#?else\\(if\\)?"                                    xbase-if             xbase-endif        nil      nil)
-    (xbase-endif          "^[\t ]*#?end[\t ]*if"                                      xbase-if             nil                nil      nil)
-    (xbase-do-case        "^[\t ]*do[\t ]+case"                                       nil                  xbase-end-case     nil      nil)
-    (xbase-case           "^[\t ]*\\(case\\|otherwise\\)"                             xbase-do-case        xbase-end-case     +        nil)
-    (xbase-end-case       "^[\t ]*endcase"                                            xbase-do-case        nil                nil      nil)
-    (xbase-for            "^[\t ]*for"                                                nil                  xbase-next         nil      nil)
-    (xbase-next           "^[\t ]*next"                                               xbase-for            nil                nil      nil)
-    (xbase-do-while       "^[\t ]*\\(do[\t ]*\\)?while"                               nil                  xbase-enddo        nil      nil)
-    (xbase-enddo          "^[\t ]*enddo"                                              xbase-do-while       nil                nil      nil)
-    (xbase-begin-sequence "^[\t ]*begin[\t ]+sequence"                                nil                  xbase-end-sequence nil      nil)
-    (xbase-break          "^[\t ]*break"                                              xbase-begin-sequence xbase-end-sequence +        -)
-    (xbase-recover        "^[\t ]*recover"                                            xbase-begin-sequence xbase-end-sequence nil      nil)
-    (xbase-end-sequence   "^[\t ]*end[\t ]+sequence"                                  xbase-begin-sequence nil                nil      nil)
-    (xbase-text           "^[\t ]*text"                                               nil                  xbase-endtext      nil      0)
-    (xbase-endtext        "^[\t ]*endtext"                                            xbase-text           nil                nil      nil)
-    (xbase-defun          "^[\t ]*\\(static\\|init\\|exit\\)?[\t ]*\\(procedure\\|function\\)[\t ]+\\(\\w+\\)[\t ]*(?" xbase-defun xbase-defun nil nil)
-    (xbase-local          "^[\t ]*local"                                              xbase-defun          xbase-defun        nil      nil))
+;;   Rule Name            RegExp                          Opening Rule         Closing Rule       Offset   Subsequent Offset  Is Statement?
+  '((xbase-if             "^[\t ]*if"                     nil                  xbase-endif        nil      nil                t)
+    (xbase-else           "^[\t ]*else\\(if\\)?"          xbase-if             xbase-endif        nil      nil                t)
+    (xbase-endif          "^[\t ]*end[\t ]*if"            xbase-if             nil                nil      nil                t)
+    (xbase-hash-if        "^[\t ]*#if"                    nil                  xbase-hash-endif   0        nil                nil)
+    (xbase-hash-else      "^[\t ]*#else\\(if\\)?"         xbase-hash-if        xbase-hash-endif   0        nil                nil)
+    (xbase-hash-endif     "^[\t ]*#end[\t ]*if"           xbase-hash-if        nil                0        nil                nil)
+    (xbase-do-case        "^[\t ]*do[\t ]+case"           nil                  xbase-end-case     nil      nil                t)
+    (xbase-case           "^[\t ]*\\(case\\|otherwise\\)" xbase-do-case        xbase-end-case     +        nil                t)
+    (xbase-end-case       "^[\t ]*endcase"                xbase-do-case        nil                nil      nil                t)
+    (xbase-for            "^[\t ]*for"                    nil                  xbase-next         nil      nil                t)
+    (xbase-next           "^[\t ]*next"                   xbase-for            nil                nil      nil                t)
+    (xbase-do-while       "^[\t ]*\\(do[\t ]*\\)?while"   nil                  xbase-enddo        nil      nil                t)
+    (xbase-enddo          "^[\t ]*enddo"                  xbase-do-while       nil                nil      nil                t)
+    (xbase-begin-sequence "^[\t ]*begin[\t ]+sequence"    nil                  xbase-end-sequence nil      nil                t)
+    (xbase-break          "^[\t ]*break"                  xbase-begin-sequence xbase-end-sequence +        -                  t)
+    (xbase-recover        "^[\t ]*recover"                xbase-begin-sequence xbase-end-sequence nil      nil                t)
+    (xbase-end-sequence   "^[\t ]*end[\t ]+sequence"      xbase-begin-sequence nil                nil      nil                t)
+    (xbase-text           "^[\t ]*text"                   nil                  xbase-endtext      nil      0                  t)
+    (xbase-endtext        "^[\t ]*endtext"                xbase-text           nil                nil      nil                t)
+    (xbase-local          "^[\t ]*local"                  xbase-defun          xbase-defun        nil      nil                t)
+    (xbase-defun          "^[\t ]*\\(static\\|init\\|exit\\)?[\t ]*\\(procedure\\|function\\)[\t ]+\\(\\w+\\)[\t ]*(?" xbase-defun xbase-defun nil nil t))
   "*Rules for indenting Xbase code."
   :type '(repeat (list    :tag "Indentation rule"
                   (symbol :tag "Rule name")
@@ -131,6 +137,12 @@
 
 (defsetf xbase-rule-subsequent-offset (rule) (store)
   `(setf (nth 5 (xbase-rule ,rule)) ,store))
+
+(defsubst xbase-rule-statement-p (rule)
+  (nth 6 (xbase-rule rule)))
+
+(defsetf xbase-rule-statement-p (rule) (store)
+  `(setf (nth 6 (xbase-rule ,rule)) ,store))
 
 (defsubst xbase-rule-opening-p (rule)
   (let ((rule (xbase-rule rule)))
@@ -229,7 +241,7 @@ If OFFSET is `+' or `-' INDENT will be either increased or decreased by
              (incf level))
             ((looking-at open-re)
              (decf level))))))
-    
+
 (defun xbase-current-line-match ()
   "Does the current line match anything in `xbase-indent-rules'?"
   (save-excursion
@@ -242,7 +254,7 @@ If OFFSET is `+' or `-' INDENT will be either increased or decreased by
 (defun xbase-find-statement-backward ()
   "Find a statement, looking at the current line and then working backwards."
   (loop for match = (xbase-current-line-match)
-        until (or (bobp) match)
+        until (or (bobp) (and match (xbase-rule-statement-p match)))
         do (xbase-previous-line)
         finally return match))
 
@@ -250,7 +262,7 @@ If OFFSET is `+' or `-' INDENT will be either increased or decreased by
   "Find a statement which satisfies TEST.
 
 This function looks at the current line and then works backwards."
-  (loop for match = (xbase-find-statement-backward) 
+  (loop for match = (xbase-find-statement-backward)
         while (and (not (bobp)) match (not (funcall test match)))
         do (progn
              (when (xbase-rule-closing-p match)
@@ -310,7 +322,10 @@ This function works backwards from the previous line."
     (let ((match (xbase-current-line-match)))
       (if match
           ;; We're on a statement.
-          (cond ((xbase-rule-opening-p match)
+          (cond ((numberp (xbase-rule-offset match))
+                 ;; Specific column.
+                 (xbase-rule-offset match))
+                ((xbase-rule-opening-p match)
                  ;; It's a block opening, indent it relative to the previous
                  ;; block opening statement.
                  (+ (xbase-previous-opening/interim-statement-indentation) xbase-mode-indent))
@@ -368,6 +383,7 @@ Note: WHOLE-EXP is currently ignored."
 (defvar xbase-mode-syntax-table
   (let ((st (make-syntax-table)))
     (modify-syntax-entry ?_  "w"      st)
+    (modify-syntax-entry ?#  "w"      st) ; So that PP stuff font locks correctly. TODO: Is this the right thing to do?
     (modify-syntax-entry ?\' "\""     st) ; "'" is a string delimiter.
     (modify-syntax-entry ?/  ". 124b" st) ; Enable "//" and "/**/" comments.
     (modify-syntax-entry ?*  ". 23"   st) ; Ditto.
@@ -431,7 +447,7 @@ Note: WHOLE-EXP is currently ignored."
   :type  'face
   :group 'xbase)
 
-(defcustom xbase-directive-face 'font-lock-keyword-face
+(defcustom xbase-directive-face 'font-lock-builtin-face
   "*Face to use for Xbase pre-processor directives."
   :type  'face
   :group 'xbase)
@@ -478,7 +494,7 @@ This function is used by `xbase-mode' as the value for
     ;; If we're on a defun, back up one line.
     (when (defunp)
       (forward-line -1))))
-                   
+
 ;;;###autoload
 (defun xbase-mode ()
   "Major mode for editing Xbase source files.
@@ -500,36 +516,36 @@ Special commands:
         end-of-defun-function #'xbase-end-of-defun
         font-lock-defaults    (list
                                (list
-                                
+
                                 ;; The first few entries deal with lists that
                                 ;; the user can configure.
-                                
+
                                 ;; User configurable list of statements.
                                 (list (regexp-opt xbase-font-lock-statements 'words) 1 xbase-keyword-face)
-                                
+
                                 ;; User configurable list of pre-processor directives.
-                                (list (concat "#" (regexp-opt xbase-font-lock-directives 'words)) 1 xbase-directive-face)
-                                
+                                (list (concat "\\<#" (regexp-opt xbase-font-lock-directives t) "\\>") 1 xbase-directive-face)
+
                                 ;; User configurable list of commands.
                                 (list (regexp-opt xbase-font-lock-commands 'words) 1 xbase-command-face)
 
                                 ;; User configurable list of logic operators
                                 (list (concat "\\." (regexp-opt xbase-font-lock-logic 'words) "\\.") 1 xbase-logic-face)
-                                
+
                                 ;; Now for some "hard wired" rules.
-                               
+
                                 ;; "defun" function names.
                                 (list "\\<\\(function\\|procedure\\|method\\|access\\|assign\\|class\\|inherit\\|from\\)\\>\\s-\\<\\(\\w*\\)\\>" 2 xbase-function-name-face)
-                                
+
                                 ;; #define constant name.
                                 (list "#[ \t]*define[ \t]+\\(\\sw+\\)" 1 xbase-variable-name-face)
-                                
+
                                 ;; Common constants.
                                 (list "\\(\\.\\(f\\|\\t\\)\\.\\|\\<\\(nil\\|self\\|super\\)\\>\\)" 0 xbase-constant-face)
-                               
+
                                )
                                nil t))
   (set-syntax-table xbase-mode-syntax-table)
   (run-hooks 'xbase-mode-hook))
-  
+
 ;;; xbase.el ends here

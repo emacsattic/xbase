@@ -1,3 +1,29 @@
+2002-06-28 10:16 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-find-statement-backward): Now only looks for
+	rules that claim they are statements. Ignores non-statement rules.
+
+2002-06-28 10:15 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-indent-level): Added support for indentation
+	fixed at a specific column.
+
+2002-06-28 10:12 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-indent-rules, xbase-rule-statement-p) 
+	(xbase-rule-statement-p): Added support for statement and
+	non-statement oriented rules. Seperated if...endif and friends out
+	from #if...#endif and friends.
+
+2002-06-28 10:10 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-mode-syntax-table): Added "#" to the "w" class.
+
+2002-06-28 09:59 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-directive-face): Now defaults to
+	font-lock-builtin-face instead of the keyword face.
+
 2002-06-27 07:45 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-add-rule): Added.
