@@ -1,3 +1,9 @@
+2002-07-01 04:54 UTC Mike Romberg <romberg@fsl.noaa.gov>
+
+	* xbase.el (xbase-indent-line): Don't indent if the current line
+	already is indented correctly.  This prevents unneeded buffer saves
+	if a user hits C-i as a matter of habbit.
+
 2002-06-28 12:46 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-mode): Updated font-lock-defaults so that the
@@ -15,7 +21,7 @@
 
 2002-06-28 10:12 UTC+0100  Dave Pearson  <davep@davep.org>
 
-	* xbase.el (xbase-indent-rules, xbase-rule-statement-p) 
+	* xbase.el (xbase-indent-rules, xbase-rule-statement-p)
 	(xbase-rule-statement-p): Added support for statement and
 	non-statement oriented rules. Seperated if...endif and friends out
 	from #if...#endif and friends.
@@ -56,7 +62,7 @@
 	but it stops xbase.el being badly formatted). See
 	<URL:http://mail.gnu.org/pipermail/bug-gnu-emacs/2002-May/012763.html>
 	my report to the emacs developers.
-	
+
 2002-05-24 10:45 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-end-of-defun): Improved the doc-string.
@@ -287,4 +293,3 @@
 2002-05-18 11:37 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-case-regexp): Added "otherwise".
-
