@@ -348,7 +348,7 @@ Note: WHOLE-EXP is currently ignored."
   (let ((pos (- (point-max) (point))))
     (back-to-indentation)
     (let ((indent-level (xbase-indent-level)))
-      (when (not (eq (current-column) indent-level))
+      (when (/= (current-column) indent-level)
         (beginning-of-line)
         (delete-horizontal-space)
         (indent-to indent-level)))
