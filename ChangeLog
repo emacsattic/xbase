@@ -1,3 +1,18 @@
+2002-05-20 10:13 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-mode): Changed `mode-name' from "xBase" to
+	"Xbase".
+
+2002-05-20 10:09 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-label-regexp): Removed.
+
+2002-05-20 10:08 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-*-regexp): Made all lower case.
+	(xbase-indent-level): Bind `case-fold-search' to t so that regular
+	expression matches are case insensitive.
+
 2002-05-18 12:03 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-indent-level): Removed code that saved `point'

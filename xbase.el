@@ -65,35 +65,35 @@ rigidly along with this one (not yet)."
         (goto-char (- (point-max) pos)))))
 
 (defconst xbase-defun-start-regexp
-  "^[ \t]*\\([Pp]rocedure\\|[Ff]unction\\)[ \t]+\\(\\w+\\)[ \t]*(?")
+  "^[ \t]*\\(procedure\\|function\\)[ \t]+\\(\\w+\\)[ \t]*(?")
 
 (defconst xbase-defun-end-regexp
-  "^[ \t]*[Ee]nd \\([Ss]ub\\|[Ff]unction\\|[Pp]roperty\\|[Tt]ype\\)")
+  "^[ \t]*end")                         ; TODO: not used at the moment, will
+					; probably need expanding.
 
 
 ;; Includes the compile-time #if variation.
-(defconst xbase-if-regexp "^[ \t]*#?[Ii]f")
-(defconst xbase-else-regexp "^[ \t]*#?[Ee]lse\\([Ii]f\\)?")
-(defconst xbase-endif-regexp "[ \t]*#?[Ee]nd[ \t]*[Ii]f")
+(defconst xbase-if-regexp "^[ \t]*#?if")
+(defconst xbase-else-regexp "^[ \t]*#?else\\(if\\)?")
+(defconst xbase-endif-regexp "[ \t]*#?end[ \t]*if")
 
-(defconst xbase-continuation-regexp "^.*\\_[ \t]*$")
-(defconst xbase-label-regexp "^[ \t]*[a-zA-Z0-9_]+:$")
+(defconst xbase-continuation-regexp "^.*\\_[ \t]*$") ; TODO: What is this for?
 
 (defconst xbase-select-regexp "^[ \t]*do[ \t]+case")
 (defconst xbase-case-regexp "^[ \t]*\\(case\\|otherwise\\)")
-(defconst xbase-select-end-regexp "^[ \t]*[Ee]ndcase")
+(defconst xbase-select-end-regexp "^[ \t]*endcase")
 
-(defconst xbase-for-regexp "^[ \t]*[Ff]or")
-(defconst xbase-next-regexp "^[ \t]*[Nn]ext")
+(defconst xbase-for-regexp "^[ \t]*for")
+(defconst xbase-next-regexp "^[ \t]*next")
 
-(defconst xbase-do-regexp "^[ \t]*[Dd]o[ \t]*[Ww]hile")
-(defconst xbase-loop-regexp "^[ \t]*[Dd]o[ \t]*[Ww]hile")
+(defconst xbase-do-regexp "^[ \t]*do[ \t]*while") ; TODO: What is this for?
+(defconst xbase-loop-regexp "^[ \t]*do[ \t]*while") ; TODO: What is this for?
 
-(defconst xbase-while-regexp "^[ \t]*[Dd]o[ \t]*[Ww]hile")
+(defconst xbase-while-regexp "^[ \t]*do[ \t]*while")
 (defconst xbase-wend-regexp "^[ \t]*enddo")
 
-(defconst xbase-with-regexp "^[ \t]*[Ww]ith")
-(defconst xbase-end-with-regexp "^[ \t]*[Ee]nd[ \t]+[Ww]ith")
+(defconst xbase-with-regexp "^[ \t]*with") ; TODO: Clipper/harbour has no "with".
+(defconst xbase-end-with-regexp "^[ \t]*end[ \t]+with")
 
 (defconst xbase-blank-regexp "^[ \t]*$")
 (defconst xbase-comment-regexp "^[ \t]*\\s<.*$")
@@ -144,67 +144,66 @@ rigidly along with this one (not yet)."
 (defun xbase-indent-level ()
   (save-excursion
     (beginning-of-line)
-    ;; Some cases depend only on where we are now.
-    (cond ((looking-at xbase-defun-start-regexp)
-           0)
-          
-          ;; The outdenting stmts, which simply match their original.
-          ((or (looking-at xbase-else-regexp)
-               (looking-at xbase-endif-regexp))
-           (message "else,endif")
-           (xbase-find-matching-if)
-           (current-indentation))
-          
-          ;; All the other matching pairs act alike.
-          ((looking-at xbase-next-regexp) ; for/next
-           (xbase-find-matching-for)
-           (current-indentation))
-          
-          ((looking-at xbase-wend-regexp) ; while/wend
-           (xbase-find-matching-while)
-           (current-indentation))
-          
-          ((looking-at xbase-select-end-regexp) ; select case/end select
-           (xbase-find-matching-select)
-           (current-indentation))
-          
-          ;; A case of a select is somewhat special.
-          ((looking-at xbase-case-regexp)
-           (xbase-find-matching-select)
-           (+ (current-indentation) xbase-mode-indent))
-          
-          
-          (t
-           ;; Other cases which depend on the previous line.
-           (xbase-previous-line-of-code)
-           (cond
-             
-             (t
-              (message "other")
-              (xbase-find-original-statement)
-              (let ((indent (current-indentation)))
-                ;; All the various +indent regexps.
-                (cond ((looking-at xbase-defun-start-regexp)
-                       (+ indent xbase-mode-indent))
-                      
-                      ((or (looking-at xbase-if-regexp)
-                           (looking-at xbase-else-regexp))
-                       (+ indent xbase-mode-indent))
-                      
-                      ((or (looking-at xbase-select-regexp)
-                           (looking-at xbase-case-regexp))
-                       (+ indent xbase-mode-indent))
-                      
-                      ((or (looking-at xbase-do-regexp)
-                           (looking-at xbase-for-regexp)
-                           (looking-at xbase-while-regexp)
-                           (looking-at xbase-with-regexp))
-                       (+ indent xbase-mode-indent))
-                      
-                      (t
-                       ;; By default, just copy indent from prev line.
-                       indent)))))))))
-
+    (let ((case-fold-search t))         ; Case insensitive search.
+      ;; Some cases depend only on where we are now.
+      (cond ((looking-at xbase-defun-start-regexp)
+             0)
+            
+            ;; The outdenting stmts, which simply match their original.
+            ((or (looking-at xbase-else-regexp)
+                 (looking-at xbase-endif-regexp))
+             (message "else,endif")
+             (xbase-find-matching-if)
+             (current-indentation))
+            
+            ;; All the other matching pairs act alike.
+            ((looking-at xbase-next-regexp) ; for/next
+             (xbase-find-matching-for)
+             (current-indentation))
+            
+            ((looking-at xbase-wend-regexp) ; while/wend
+             (xbase-find-matching-while)
+             (current-indentation))
+            
+            ((looking-at xbase-select-end-regexp) ; select case/end select
+             (xbase-find-matching-select)
+             (current-indentation))
+            
+            ;; A case of a select is somewhat special.
+            ((looking-at xbase-case-regexp)
+             (xbase-find-matching-select)
+             (+ (current-indentation) xbase-mode-indent))
+            
+            
+            (t
+             ;; Other cases which depend on the previous line.
+             (xbase-previous-line-of-code)
+             (cond (t
+                    (message "other")
+                    (xbase-find-original-statement)
+                    (let ((indent (current-indentation)))
+                      ;; All the various +indent regexps.
+                      (cond ((looking-at xbase-defun-start-regexp)
+                             (+ indent xbase-mode-indent))
+                            
+                            ((or (looking-at xbase-if-regexp)
+                                 (looking-at xbase-else-regexp))
+                             (+ indent xbase-mode-indent))
+                            
+                            ((or (looking-at xbase-select-regexp)
+                                 (looking-at xbase-case-regexp))
+                             (+ indent xbase-mode-indent))
+                            
+                            ((or (looking-at xbase-do-regexp)
+                                 (looking-at xbase-for-regexp)
+                                 (looking-at xbase-while-regexp)
+                                 (looking-at xbase-with-regexp))
+                             (+ indent xbase-mode-indent))
+                            
+                            (t
+                             ;; By default, just copy indent from prev line.
+                             indent))))))))))
+  
 (defvar xbase-mode-hook nil
   "*List of functions to call when enterning xbase mode.")
 
@@ -287,7 +286,7 @@ rigidly along with this one (not yet)."
   (kill-all-local-variables)
   (use-local-map xbase-mode-map)
   (setq major-mode           'xbase-mode
-        mode-name            "xBase"
+        mode-name            "Xbase"
         indent-line-function 'xbase-indent-line)
   (make-local-variable 'font-lock-defaults)
   (make-local-variable 'xbase-indent-level)
