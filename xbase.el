@@ -233,23 +233,52 @@ rigidly along with this one (not yet)."
           "use\\|seek\\|index\\|close\\|save\\|restore\\|select\\|read\\|"
           "sele\\|exit"
           "\\)\\>"))
-;; font-lock-function-name-face
-;; font-lock-builtin-face
-;; font-lock-variable-name-face
-;; font-lock-constant-face
-;; font-lock-type-face
+
+;; font-lock-function-name-face "Face name to use for function names.")
+;; font-lock-comment-face "Face name to use for comments."
+
+;; font-lock-string-face  "Face name to use for strings.")
+;; font-lock-keyword-face "Face name to use for keywords.")
+;; font-lock-builtin-face "Face name to use for builtins.")
+;; font-lock-variable-name-face "Face name to use for variable names.")
+;; font-lock-type-face	     "Face name to use for type and class names.")
+;; font-lock-constant-face   "Face name to use for constant and label names.")
+;; font-lock-warning-face	  "Face name to use for things that should stand out.")
+;; font-lock-reference-face  "This variable is obsolete.  Use font-lock-constant-face.")
+
 (defvar xbase-font-lock-keywords
-  `(("^\\s-*\\*.*" 0 font-lock-comment-face t)
-    ("&&.*" 0 font-lock-comment-face t)
-    ("\\<\\(public\\|private\\|declare\\)\\>" . font-lock-type-face)
-    (,xbase-builtins . font-lock-builtin-face)
-    ("\\.\\(f\\|t\\)\\." 1 font-lock-constant-face)
-    (,xbase-keywords . font-lock-keyword-face)
-    ("\\<\\(function\\|procedure\\)\\>\\s-\\<\\(.*\\)\\>"
+  `(("\\<\\(function\\|procedure\\)\\>\\s-\\<\\(\\w*\\)\\>"
      2 font-lock-function-name-face t)
-    (,(concat "\\<\\(public\\|private\\|declare\\|use\\|close\\|from\\)\\>"
-              "\\s-\\<\\(.*\\)\\>") 2 font-lock-variable-name-face)
+
+    ;; Fontify function macro names.
+    ("^#[ \t]*define[ \t]+\\(\\sw+\\)(" 1 font-lock-function-name-face)
+
+    ;; Fontify symbol names in #elif or #if ... defined preprocessor directives
+    ("^#[ \t]*\\(elif\\|if\\)\\>"
+     ("\\<\\(defined\\)\\>[ \t]*(?\\(\\sw+\\)?" nil nil
+      (1 font-lock-builtin-face) (2 font-lock-variable-name-face nil t)))
+
+    ;; Fontify otherwise as symbol names, and the preprocessor directive names.
+    ("^#[ \t]*\\(\\sw+\\)\\>[ \t!]*\\(\\sw+\\)?"
+     (1 font-lock-builtin-face) (2 font-lock-variable-name-face nil t))
+
+    ;; Comments
+    ("\\(\\*\\|//\\|&&\\).*$" 0 font-lock-comment-face t)
+    ;; This does not yet work on multi line comments
+    ("/\\*.*\\*/" 0 font-lock-comment-face t)
+
+    ("\\<\\(public\\|private\\|local\\|static\\)\\>" . font-lock-type-face)
+
+    (,xbase-builtins . font-lock-builtin-face)
+
+    ("\\.\\(f\\|t\\)\\." 0 font-lock-constant-face)
+    ("\\<nil\\>" 0 font-lock-constant-face)
+
+    (,xbase-keywords . font-lock-keyword-face)
+
     ("\'[^\n]*\'" 0 font-lock-string-face)
+    ("\\[[^\n]*\\]" 0 font-lock-string-face)
+
     "Default font-lock keywords for xbase mode."))
 
 (defun xbase-mode ()
