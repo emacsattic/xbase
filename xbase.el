@@ -204,13 +204,14 @@
         (setf (xbase-rule-subsequent-offset rule) offset)
       (error "%s is not a valid indent rule" rule-name))))
 
-(defun xbase-add-rule (name regexp opening-rule closing-rule &optional offset subsequent-offset)
+(defun xbase-add-rule (name regexp opening-rule closing-rule is-statement &optional offset subsequent-offset)
   "Add a new rule to xbase-mode's identation rules.
 
 NAME is a symbol that is the name of the rule.
 REGEXP is a regular expression for checking a line matches the rule.
 OPENING-RULE is the name of a rule that is the opening for this line type.
 CLOSING-RULE is the name of a rule that is the closing for this line type.
+If IS-STATEMENT is non-nil then the rule will be be for a statement.
 OFFSET is an optional offset value for indenting a line matching this rule.
 SUBSEQUENT-OFFSET is an optional offset value for indenting subsequent lines.
 
@@ -220,11 +221,11 @@ If you write your Xbase code so that you only have one RETURN statement in a
 function or procedure and you want the RETURN statement to be indented to
 the 0th column you could use this function to add such a rule:
 
-  (xbase-add-rule 'xbase-return \"^[\\t ]*return\" 'xbase-defun nil 0)
+  (xbase-add-rule 'xbase-return \"^[\\t ]*return\" 'xbase-defun nil t 0)
 
 Calling this function updates `xbase-indent-rules'."
   (unless (xbase-rule name)
-    (nconc xbase-indent-rules (list (list name regexp opening-rule closing-rule offset subsequent-offset)))))
+    (nconc xbase-indent-rules (list (list name regexp opening-rule closing-rule offset subsequent-offset is-statement)))))
 
 ;; Functions for calculating indentation.
 
@@ -363,6 +364,7 @@ This function works backwards from the previous line."
           ;; We're on a statement.
           (cond ((numberp (xbase-rule-offset match))
                  ;; Specific column.
+                 (message "Fixed at %d" (xbase-rule-offset match))
                  (xbase-rule-offset match))
                 ((xbase-rule-opening-p match)
                  ;; It's a block opening, indent it relative to the previous

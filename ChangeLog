@@ -1,3 +1,13 @@
+2002-07-16 00:08 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-add-rule): `is-statement' added as a required
+	parameter.
+
+2002-07-16 00:07 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-indent-level): Added a message when the
+	indentation is fixed to a specific column.
+
 2002-07-13 12:06 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-add-rule): Added docstring.
