@@ -1,5 +1,6 @@
 ;;; xbase.el --- A mode for editing Xbase programs.
-;; Copyright (C) 2002 Mike Romberg <romberg@fsl.noaa.gov>
+;; Copyright (C) 2002 Mike Romberg <romberg@fsl.noaa.gov> and
+;;                    Dave Pearson <davep@davep.org>
 ;; $Id$
 
 ;; xbase.el is free software distributed under the terms of the GNU General

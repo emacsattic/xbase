@@ -1,3 +1,7 @@
+2002-05-24 18:07 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el: Added joint copyright.
+
 2002-05-24 15:34 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-end-of-defun): Renamed `defunp' to `is-defun-p'
