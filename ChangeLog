@@ -1,3 +1,7 @@
+2002-07-12 09:37 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el: Added the commentary and installation hints.
+
 2002-07-02 09:56 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-indent-line): (/= ...) instead of (not (eq ...)).

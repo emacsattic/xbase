@@ -8,10 +8,16 @@
 
 ;;; Commentary:
 ;;
-;; xbase.el is blah blah blah.
+;; xbase.el provides a mode for editing Xbase source code. xbase.el mostly
+;; supports programs written for CA-Clipper and Clipper compatible compilers
+;; (for example, harbour <URL:http://www.harbour-project.org/>) although,
+;; where possible, support for other Xbase dialects will be added.
+;;
+;; You can always find the latest version of xbase.el at:
+;;
+;; <URL:http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/xbasemode/xbasemode/xbase.el?rev=HEAD>
 
 ;;; THANKS:
-;;
 ;;
 
 ;;; BUGS:
@@ -22,6 +28,8 @@
 ;;      For n := 1 To 10; Next
 ;;
 ;;   will look like an unclosed For...Next loop.
+;;
+;; o No support for the [] string delimiters.
 
 ;;; TODO:
 ;;
@@ -38,7 +46,19 @@
 
 ;;; INSTALLATION:
 ;;
+;; o Drop xbase.el somewhere into your `load-path'. Try your site-lisp
+;;   directory for example. You might also want to consider byte compiling
+;;   the file to produce xbase.elc (see `byte-compile-file' in your emacs
+;;   documentation).
 ;;
+;; o Add an autoload to ~/.emacs, for example:
+;;
+;;   (autoload 'xbase-mode "xbase" "Xbase mode" t)
+;;
+;; o Add the following to ~/.emacs to ensure that xbase-mode is used when
+;;   you edit Xbase code:
+;;
+;;   (setq auto-mode-alist (cons (cons "\\.\\(prg\\|ch\\)$" 'xbase-mode) auto-mode-alist))
 
 ;;; Code:
 
