@@ -27,9 +27,25 @@
 ;; found in Fred White's <fwhite@world.std.com> basic-mode.el.
 ;; It has been modified slightly to work with xbase code.
 
-(provide 'xbase)
+;; Attempt to handle older/other emacs.
+(eval-and-compile
+  ;; If customize isn't available just use defvar instead.
+  (unless (fboundp 'defgroup)
+    (defmacro defgroup  (&rest rest) nil)
+    (defmacro defcustom (symbol init docstring &rest rest)
+      `(defvar ,symbol ,init ,docstring))))
 
-(defvar xbase-mode-indent 4 "*Default indentation per nesting level")
+;; Customize options.
+
+(defgroup xbase nil
+  "Mode for editing Xbase source."
+  :group 'languages
+  :prefix "xbase-")
+
+(defcustom xbase-mode-indent 3
+  "*Default indentation per nesting level"
+  :type 'integer
+  :group 'xbase)
 
 (defun xbase-indent-line (&optional whole-exp)
   "Indent current line as xBase code.
@@ -37,18 +53,16 @@ With argument, indent any additional lines of the same clause
 rigidly along with this one (not yet)."
   (interactive "p")
   (let ((indent (xbase-indent-level))
-	(pos (- (point-max) (point))) beg)
-    (beginning-of-line)
-    (setq beg (point))
+	(pos (- (point-max) (point)))
+        (beg (progn
+               (beginning-of-line)
+               (point))))
     (skip-chars-forward " \t")
-    (if (zerop (- indent (current-column)))
-	nil
+    (unless (zerop (- indent (current-column)))
       (delete-region beg (point))
       (indent-to indent))
     (if (> (- (point-max) pos) (point))
-	(goto-char (- (point-max) pos)))
-    ))
-
+	(goto-char (- (point-max) pos)))))
 
 (defconst xbase-defun-start-regexp
   "^[ \t]*\\([Pp]rocedure\\|[Ff]unction\\)[ \t]+\\(\\w+\\)[ \t]*(?")
@@ -194,6 +208,7 @@ rigidly along with this one (not yet)."
 
 (defvar xbase-mode-hook nil
   "*List of functions to call when enterning xbase mode.")
+
 (defvar xbase-mode-map
   (let ((map (make-sparse-keymap))
 	(menu-map (make-sparse-keymap "Insert")))
@@ -249,3 +264,7 @@ rigidly along with this one (not yet)."
   (setq font-lock-defaults '(xbase-font-lock-keywords nil t))
   (font-lock-mode)
   (run-hooks 'xbase-mode-hook))
+
+(provide 'xbase)
+
+;;; xbase.el ends here.
