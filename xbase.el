@@ -236,7 +236,7 @@ If OFFSET is `+' or `-' INDENT will be either increased or decreased by
 
 (defun xbase-find-statement-backward ()
   "Find a statement, looking at the current line and then working backwards."
-  (loop for match = (xbase-current-line-match) then (xbase-current-line-match)
+  (loop for match = (xbase-current-line-match)
         until (or (bobp) match)
         do (xbase-previous-line)
         finally return match))
@@ -245,7 +245,7 @@ If OFFSET is `+' or `-' INDENT will be either increased or decreased by
   "Find a statement which satisfies TEST.
 
 This function looks at the current line and then works backwards."
-  (loop for match = (xbase-find-statement-backward) then (xbase-find-statement-backward)
+  (loop for match = (xbase-find-statement-backward) 
         while (and (not (bobp)) match (not (funcall test match)))
         do (progn
              (when (xbase-rule-closing-p match)
@@ -459,7 +459,10 @@ Note: WHOLE-EXP is currently ignored."
 ;; xbase-mode code.
 
 (defun xbase-end-of-defun ()
-  "Place `point' on what looks like the end of the current defun."
+  "Place `point' on what looks like the end of the current defun.
+
+This function is used by `xbase-mode' as the value for
+`end-of-defun-function'. This makes \\[end-of-defun] work in Xbase buffers."
   (flet ((defunp ()
              (eq (xbase-rule-name (xbase-current-line-match)) 'xbase-defun)))
     (when (defunp)                      ; If we're on the start of a function.

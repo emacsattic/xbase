@@ -1,3 +1,13 @@
+2002-05-24 10:45 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-end-of-defun): Improved the doc-string.
+
+2002-05-24 10:39 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-find-statement-backward): Removed `then' part of
+	loop. Not required.
+	(xbase-find-some-statement-backward): As above.
+
 2002-05-24 09:46 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-find-matching-statement): Simplified the test of
