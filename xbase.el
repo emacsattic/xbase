@@ -281,6 +281,7 @@ rigidly along with this one (not yet)."
 
     "Default font-lock keywords for xbase mode."))
 
+;;;###autoload
 (defun xbase-mode ()
   "Major mode for editing xbase files."
   (interactive)
