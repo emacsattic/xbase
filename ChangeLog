@@ -1,3 +1,8 @@
+2002-06-28 12:46 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-mode): Updated font-lock-defaults so that the
+	#ifdef/#ifndef "argument" is displayed in the "varable" face.
+
 2002-06-28 10:16 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-find-statement-backward): Now only looks for

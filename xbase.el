@@ -537,8 +537,8 @@ Special commands:
                                 ;; "defun" function names.
                                 (list "\\<\\(function\\|procedure\\|method\\|access\\|assign\\|class\\|inherit\\|from\\)\\>\\s-\\<\\(\\w*\\)\\>" 2 xbase-function-name-face)
 
-                                ;; #define constant name.
-                                (list "#[ \t]*define[ \t]+\\(\\sw+\\)" 1 xbase-variable-name-face)
+                                ;; #define/ifdef/ifndef "constant" name.
+                                (list "#[ \t]*\\(define\\|ifn?def\\)[ \t]+\\(\\sw+\\)" 2 xbase-variable-name-face)
 
                                 ;; Common constants.
                                 (list "\\(\\.\\(f\\|\\t\\)\\.\\|\\<\\(nil\\|self\\|super\\)\\>\\)" 0 xbase-constant-face)
