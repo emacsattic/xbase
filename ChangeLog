@@ -1,3 +1,8 @@
+2002-06-11 15:12 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-font-lock-statements): Removed duplicate mention
+	of "static".
+
 2002-05-27 11:48 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-end-of-defun): Renamed `is-defun-p' back to
