@@ -171,6 +171,13 @@
 ;; Functions for calculating indentation.
 
 (defun xbase-calculate-indent-with-offset (indent offset)
+  "Calculate the indentation level given INDENT and OFFSET.
+
+INDENT is the intended indentation level.
+If OFFSET is nil then INDENT is returned.
+If OFFSET is a number then that column will be returned.
+If OFFSET is `+' or `-' INDENT will be either increased or decreased by
+`xbase-mode-indent'."
   (cond ((null offset)                  ; No offset.
          indent)
         ((numberp offset)               ; Specific column.
@@ -202,6 +209,7 @@
     (xbase-beginning-of-line)))
 
 (defun xbase-find-matching-statement (rule)
+  "Find the opening statement for a block statement of RULE type."
   (let ((level            1)
         (case-fold-search t)            ; Xbase is case insensitive.
         (open-re          (xbase-rule-opening-regexp rule))
@@ -231,6 +239,9 @@
         finally return match))
 
 (defun xbase-find-some-statement-backward (test)
+  "Find a statement which satisfies TEST.
+
+This function looks at the current line and then works backwards."
   (loop for match = (xbase-find-statement-backward) then (xbase-find-statement-backward)
         while (and (not (bobp)) match (not (funcall test match)))
         do (progn
@@ -240,13 +251,21 @@
         finally return match))
 
 (defun xbase-find-opening-statement-backward ()
+  "Find a block opening statement.
+
+This function looks at the current line and then works backwards."
   (xbase-find-some-statement-backward #'(lambda (rule) (xbase-rule-opening-p rule))))
 
-
 (defun xbase-find-opening/interim-statement-backward ()
+  "Find a block opening or interim statement.
+
+This function looks at the current line and then works backwards."
   (xbase-find-some-statement-backward #'(lambda (rule) (not (xbase-rule-closing-p rule)))))
 
 (defun xbase-some-statement-indentation (statement-type)
+  "Get the indentation level of previous statement of STATEMENT-TYPE.
+
+This function works backwards from the previous line."
   (save-excursion
     (let ((match (unless (bobp)
                    (xbase-previous-line)
@@ -259,18 +278,26 @@
              (- xbase-mode-indent))))))
 
 (defun xbase-previous-opening-statement-indentation ()
+  "Get the indentation level of previous opening statement.
+
+This function works backwards from the previous line."
   (xbase-some-statement-indentation #'xbase-find-opening-statement-backward))
 
 (defun xbase-previous-opening/interim-statement-indentation ()
+  "Get the indentation level of previous opening or interim statement.
+
+This function works backwards from the previous line."
   (xbase-some-statement-indentation #'xbase-find-opening/interim-statement-backward))
 
 (defun xbase-matching-statement-indentation (rule)
+  "Return the indentation level of the opening RULE type statement."
   (save-excursion
     (xbase-find-matching-statement rule)
     (message "Matched to %s" (xbase-rule-name (xbase-current-line-match)))
     (current-indentation)))
 
 (defun xbase-indent-level ()
+  "Return the indentation level to be used for the current line of code."
   (save-excursion
     (let ((match (xbase-current-line-match)))
       (if match
@@ -419,7 +446,7 @@ Special commands:
   (make-local-variable 'font-lock-defaults)
   (setq major-mode           'xbase-mode
         mode-name            "Xbase"
-        indent-line-function 'xbase-indent-line
+        indent-line-function #'xbase-indent-line
         font-lock-defaults   (list
                               (list
 
