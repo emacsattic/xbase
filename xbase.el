@@ -80,7 +80,7 @@ rigidly along with this one (not yet)."
 (defconst xbase-label-regexp "^[ \t]*[a-zA-Z0-9_]+:$")
 
 (defconst xbase-select-regexp "^[ \t]*do[ \t]+case")
-(defconst xbase-case-regexp "^[ \t]*case")
+(defconst xbase-case-regexp "^[ \t]*\\(case\\|otherwise\\)")
 (defconst xbase-select-end-regexp "^[ \t]*[Ee]ndcase")
 
 (defconst xbase-for-regexp "^[ \t]*[Ff]or")
@@ -285,9 +285,10 @@ rigidly along with this one (not yet)."
   "Major mode for editing xbase files."
   (interactive)
   (kill-all-local-variables)
-  (setq major-mode 'xbase-mode)
-  (setq mode-name "xBase")
-  (setq indent-line-function 'xbase-indent-line)
+  (use-local-map xbase-mode-map)
+  (setq major-mode           'xbase-mode
+        mode-name            "xBase"
+        indent-line-function 'xbase-indent-line)
   (make-local-variable 'font-lock-defaults)
   (make-local-variable 'xbase-indent-level)
   (setq font-lock-defaults '(xbase-font-lock-keywords nil t))

@@ -1,0 +1,13 @@
+2002-05-18 11:39 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-mode): Added autoload marker.
+
+2002-05-18 11:38 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-mode): Actually use `xbase-mode-map'.
+	Set all values in one `setq'.
+
+2002-05-18 11:37 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-case-regexp): Added "otherwise".
+
