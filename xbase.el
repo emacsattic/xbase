@@ -285,6 +285,7 @@ rigidly along with this one (not yet)."
   (interactive)
   (kill-all-local-variables)
   (use-local-map xbase-mode-map)
+  (make-local-variable 'indent-line-function)
   (setq major-mode           'xbase-mode
         mode-name            "Xbase"
         indent-line-function 'xbase-indent-line)
