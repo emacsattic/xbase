@@ -171,6 +171,10 @@
         (setf (xbase-rule-subsequent-offset rule) offset)
       (error "%s is not a valid indent rule" rule-name))))
 
+(defun xbase-add-rule (name regexp opening-rule closing-rule &optional offset subsequent-offset)
+  (unless (xbase-rule name)
+    (nconc xbase-indent-rules (list (list name regexp opening-rule closing-rule offset subsequent-offset)))))
+
 ;; Functions for calculating indentation.
 
 (defun xbase-calculate-indent-with-offset (indent offset)
