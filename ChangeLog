@@ -1,3 +1,8 @@
+2002-05-22 16:58 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-indent-line): Modified to use
+	`delete-horizontal-space'.
+
 2002-05-22 14:55 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-font-lock-statements): Added various OO oriented

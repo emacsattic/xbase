@@ -295,17 +295,11 @@
 
 Note: WHOLE-EXP is currently ignored."
   (interactive "p")
-  (let ((indent (xbase-indent-level))
-        (pos    (- (point-max) (point)))
-        (beg    (progn
-                  (beginning-of-line)
-                  (point))))
-    (skip-chars-forward " \t")
-    (unless (zerop (- indent (current-column)))
-      (delete-region beg (point))
-      (indent-to indent))
-    (when (> (- (point-max) pos) (point))
-      (setf (point) (- (point-max) pos)))))
+  (let ((pos (- (point-max) (point))))
+    (beginning-of-line)
+    (delete-horizontal-space)
+    (indent-to (xbase-indent-level))
+    (setf (point) (- (point-max) pos))))
 
 ;; xbase-mode customize options.
 
@@ -438,7 +432,7 @@ Special commands:
                                ;; User configurable list of pre-processor directives.
                                (list (concat "#" (regexp-opt xbase-font-lock-directives 'words)) 1 xbase-directive-face)
                                
-                               ;; user configurable list of commands.
+                               ;; User configurable list of commands.
                                (list (regexp-opt xbase-font-lock-commands 'words) 1 xbase-command-face)
 
                                ;; Now for some "hard wired" rules.
