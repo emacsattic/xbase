@@ -1,3 +1,10 @@
+2002-05-22 18:18 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-calculate-indent-with-offset): Really fixed the
+	error message (I'd forgotten to pass the value of `offset' to
+	`error' so that the format string would have the corrent
+	argument).
+
 2002-05-22 17:52 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el (xbase-calculate-indent-with-offset): Fixed error
