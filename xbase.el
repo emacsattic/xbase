@@ -68,6 +68,8 @@
     (xbase-break          "^[\t ]*break"                                              xbase-begin-sequence xbase-end-sequence +        -)
     (xbase-recover        "^[\t ]*recover"                                            xbase-begin-sequence xbase-end-sequence nil      nil)
     (xbase-end-sequence   "^[\t ]*end[\t ]+sequence"                                  xbase-begin-sequence nil                nil      nil)
+    (xbase-text           "^[\t ]*text"                                               nil                  xbase-endtext      nil      0)
+    (xbase-endtext        "^[\t ]*endtext"                                            xbase-text           nil                nil      nil)
     (xbase-defun          "^[\t ]*\\(procedure\\|function\\)[\t ]+\\(\\w+\\)[\t ]*(?" xbase-defun          xbase-defun        nil      nil)
     (xbase-local          "^[\t ]*local"                                              xbase-defun          xbase-defun        nil      nil))
   "*Rules for indenting Xbase code."
@@ -83,6 +85,7 @@
                   (choice :tag "Extra offset for subsequent lines of code"
                    (const :tag "Add one extra level of indentation" +)
                    (const :tag "Remove one level of indentation" -)
+                   (const :tag "Remove all indentation" 0)
                    (const :tag "Use the calculated indentation level" nil))))
   :group 'xbase)
 
@@ -158,10 +161,15 @@
 
 ;; Functions for calculating indentation.
 
-(defun xbase-calculate-offset (offset)
-  (if offset
-      (funcall offset xbase-mode-indent)
-    0))
+(defun xbase-calculate-indent-with-offset (indent offset)
+  (cond ((null offset)                  ; No offset.
+         indent)
+        ((numberp offset)               ; Specific column.
+         (- offset xbase-mode-indent))
+        ((fboundp offset)               ; + and - are used as functions.
+         (+ indent (funcall offset xbase-mode-indent)))
+        (t
+         (error "'%' is not a valid offset"))))
 
 (defun xbase-continuation-line-p ()
   "Is the current line of code a continuation of the previous line?"
@@ -225,25 +233,22 @@
 (defun xbase-find-opening-statement-backward ()
   (xbase-find-some-statement-backward #'(lambda (rule) (xbase-rule-opening-p rule))))
 
-(defun xbase-previous-opening-statement-indentation ()
-  (save-excursion
-    (xbase-previous-line)
-    (let ((match (xbase-find-opening-statement-backward)))
-      (message "Matched to %s" (xbase-rule-name match))
-      (current-indentation))))
 
 (defun xbase-find-opening/interim-statement-backward ()
   (xbase-find-some-statement-backward #'(lambda (rule) (not (xbase-rule-closing-p rule)))))
- 
-(defun xbase-previous-opening/interim-statement-indentation ()
+
+(defun xbase-some-statement-indentation (statement-type)
   (save-excursion
     (xbase-previous-line)
-    (let ((match (xbase-find-opening/interim-statement-backward)))
+    (let ((match (funcall statement-type)))
       (message "Matched to %s" (xbase-rule-name match))
-      (+ (current-indentation)
-         (if (xbase-rule-interim-p match)
-             (xbase-calculate-offset (xbase-rule-subsequent-offset match))
-           0)))))
+      (xbase-calculate-indent-with-offset (current-indentation) (xbase-rule-subsequent-offset match)))))
+
+(defun xbase-previous-opening-statement-indentation ()
+  (xbase-some-statement-indentation #'xbase-find-opening-statement-backward))
+
+(defun xbase-previous-opening/interim-statement-indentation ()
+  (xbase-some-statement-indentation #'xbase-find-opening/interim-statement-backward))
 
 (defun xbase-matching-statement-indentation (rule)
   (save-excursion
@@ -266,8 +271,7 @@
                  (xbase-matching-statement-indentation match))
                 (t
                  ;; It's an "interim" statement.
-                 (+ (xbase-previous-opening-statement-indentation)
-                    (xbase-calculate-offset (xbase-rule-offset (xbase-current-line-match))))))
+                 (xbase-calculate-indent-with-offset (xbase-previous-opening-statement-indentation) (xbase-rule-offset (xbase-current-line-match)))))
         ;; We're on a "normal" line of code, indent it to the previous
         ;; opening/interim statement.
         (+ (xbase-previous-opening/interim-statement-indentation) xbase-mode-indent)))))
@@ -311,7 +315,7 @@ Note: WHOLE-EXP is currently ignored."
 
 ;; xbase-mode font lock customize options.
 
-(defcustom xbase-font-lock-keywords
+(defcustom xbase-font-lock-statements
   '("announce"
     "begin" "sequence" "break" "recover" "using" "end" "sequence"
     "declare"
@@ -329,7 +333,7 @@ Note: WHOLE-EXP is currently ignored."
     "private"
     "public"
     "request")
-  "*Xbase keywords for font locking."
+  "*Xbase statements for font locking."
   :type  '(repeat string)
   :group 'xbase)
 
@@ -342,6 +346,12 @@ Note: WHOLE-EXP is currently ignored."
     "#stdout"
     "#undef")
   "*Xbase directives for font locking."
+  :type  '(repeat string)
+  :group 'xbase)
+
+(defcustom xbase-font-lock-commands
+  '("text" "endtext")                   ; TODO: Lots more to add.
+  "*Xbase commands for font locking."
   :type  '(repeat string)
   :group 'xbase)
 
@@ -362,9 +372,11 @@ Special commands:
   (setq major-mode           'xbase-mode
         mode-name            "Xbase"
         indent-line-function 'xbase-indent-line
-        font-lock-defaults   (list (list (list (concat "\\<\\(" (regexp-opt xbase-font-lock-keywords) "\\)\\>")
+        font-lock-defaults   (list (list (list (concat "\\<\\(" (regexp-opt xbase-font-lock-statements) "\\)\\>")
                                                1 font-lock-keyword-face t)
                                          (list (concat "\\<\\(" (regexp-opt xbase-font-lock-directives) "\\)\\>")
+                                               1 font-lock-constant-face t)
+                                         (list (concat "\\<\\(" (regexp-opt xbase-font-lock-commands) "\\)\\>")
                                                1 font-lock-constant-face t))
                                    t t nil nil))
   (set-syntax-table xbase-mode-syntax-table)

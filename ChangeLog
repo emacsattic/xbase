@@ -1,3 +1,30 @@
+2002-05-22 10:18 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-font-lock-commands): Added.
+	(xbase-mode): Changed value of `font-lock-defaults' to use the above.
+
+2002-05-22 10:16 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-font-lock-keywords): Renamed to `xbase-font-lock-statements'.
+	(xbase-mode): Changed value of `font-lock-defaults' to use the above.
+
+2002-05-22 10:11 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-calculate-offset): Removed.
+	(xbase-calculate-indent-with-offset): Added. This replaces
+	`xbase-calculate-offset'. The main difference is that a specific
+	column value is now supported as an "offset". This means that the
+	likes of TEXT/ENDTEXT can support having the intervening text at
+	column zero.
+	(xbase-some-statement-indentation): Added.
+	(xbase-previous-opening-statement-indentation) Changed to use the
+	above.
+	(xbase-previous-opening/interim-statement-indentation): Changed to
+	use the above.
+	(xbase-indent-level): Changed to use
+	`xbase-calculate-indent-with-offset'.
+	(xbase-indent-rules): Added TEXT/ENDTEXT support.
+
 2002-05-22 09:04 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el: Major re-working of indentation code and font lock
