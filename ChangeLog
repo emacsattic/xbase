@@ -1,3 +1,26 @@
+2002-05-23 10:32 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-end-of-defun): Added.
+	(xbase-mode): Added `end-of-defun-function' as a local variable.
+	Set it to the above. This means that `end-of-defun' will work in
+	xbase buffers.
+
+2002-05-23 10:16 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-mode): Added `defun-prompt-regexp' as a local
+	variable. Set it to (xbase-rule-regexp 'xbase-defun). This means
+	that `beginning-of-defun' will work in xbase buffers.
+
+2002-05-23 10:08 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-describe-line): Added.
+	(xbase-mode-map): Bound the above to "C-c C-l".
+
+2002-05-23 09:56 UTC+0100  Dave Pearson  <davep@davep.org>
+
+	* xbase.el (xbase-indent-line): Fixed `point' repositioning glitch
+	introduced earlier.
+
 2002-05-23 09:41 UTC+0100  Dave Pearson  <davep@davep.org>
 
 	* xbase.el: Added documentation strings to various functions.

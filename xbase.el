@@ -175,7 +175,8 @@
 
 INDENT is the intended indentation level.
 If OFFSET is nil then INDENT is returned.
-If OFFSET is a number then that column will be returned.
+If OFFSET is a number then that value will be returned, minus
+`xbase-mode-indent'.
 If OFFSET is `+' or `-' INDENT will be either increased or decreased by
 `xbase-mode-indent'."
   (cond ((null offset)                  ; No offset.
@@ -326,7 +327,19 @@ Note: WHOLE-EXP is currently ignored."
     (beginning-of-line)
     (delete-horizontal-space)
     (indent-to (xbase-indent-level))
-    (setf (point) (- (point-max) pos))))
+    (let ((target-pos (- (point-max) pos)))
+      (when (> target-pos (point))
+        (setf (point) target-pos)))))
+
+;; Useful commands for use in xbase-mode.
+
+(defun xbase-describe-line ()
+  "Describe the current line."
+  (interactive)
+  (let ((match (xbase-current-line-match)))
+    (if match
+        (message "This line matches the %s rule" (xbase-rule-name match))
+      (message "This is an ordinary line of code"))))
 
 ;; xbase-mode customize options.
 
@@ -339,7 +352,7 @@ Note: WHOLE-EXP is currently ignored."
 
 (defvar xbase-mode-map
   (let ((map (make-sparse-keymap)))
-    ;; Nothing special at the moment.
+    (define-key map [(control c) (control l)] #'xbase-describe-line)
     map)
     "Keymap used in `xbase-mode'.")
 
@@ -432,6 +445,18 @@ Note: WHOLE-EXP is currently ignored."
 
 ;; xbase-mode code.
 
+(defun xbase-end-of-defun ()
+  "Place `point' on what looks like the end of the current defun."
+  (flet ((defunp ()
+             (eq (xbase-rule-name (xbase-current-line-match)) 'xbase-defun)))
+    (when (defunp)                      ; If we're on the start of a function.
+      (forward-line 1))                 ; Skip forward a line.
+    ;; Look for the start of another function or the end of the buffer.
+    (loop while (and (not (eobp)) (not (defunp))) do (forward-line 1))
+    ;; If we're on a defun, back up one line.
+    (when (defunp)
+      (forward-line -1))))
+                   
 ;;;###autoload
 (defun xbase-mode ()
   "Major mode for editing Xbase source files.
@@ -444,37 +469,41 @@ Special commands:
   (use-local-map xbase-mode-map)
   (make-local-variable 'indent-line-function)
   (make-local-variable 'font-lock-defaults)
-  (setq major-mode           'xbase-mode
-        mode-name            "Xbase"
-        indent-line-function #'xbase-indent-line
-        font-lock-defaults   (list
-                              (list
-
-                               ;; The first few entries deal with lists that
-                               ;; the user can configure.
+  (make-local-variable 'defun-prompt-regexp)
+  (make-local-variable 'end-of-defun-function)
+  (setq major-mode            'xbase-mode
+        mode-name             "Xbase"
+        indent-line-function  #'xbase-indent-line
+        defun-prompt-regexp   (xbase-rule-regexp 'xbase-defun)
+        end-of-defun-function #'xbase-end-of-defun
+        font-lock-defaults    (list
+                               (list
+                                
+                                ;; The first few entries deal with lists that
+                                ;; the user can configure.
+                                
+                                ;; User configurable list of statements.
+                                (list (regexp-opt xbase-font-lock-statements 'words) 1 xbase-keyword-face)
+                                
+                                ;; User configurable list of pre-processor directives.
+                                (list (concat "#" (regexp-opt xbase-font-lock-directives 'words)) 1 xbase-directive-face)
+                                
+                                ;; User configurable list of commands.
+                                (list (regexp-opt xbase-font-lock-commands 'words) 1 xbase-command-face)
+                                
+                                ;; Now for some "hard wired" rules.
                                
-                               ;; User configurable list of statements.
-                               (list (regexp-opt xbase-font-lock-statements 'words) 1 xbase-keyword-face)
-                               
-                               ;; User configurable list of pre-processor directives.
-                               (list (concat "#" (regexp-opt xbase-font-lock-directives 'words)) 1 xbase-directive-face)
-                               
-                               ;; User configurable list of commands.
-                               (list (regexp-opt xbase-font-lock-commands 'words) 1 xbase-command-face)
-
-                               ;; Now for some "hard wired" rules.
-                               
-                               ;; "defun" function names.
-                               (list "\\<\\(function\\|procedure\\|method\\|access\\|assign\\|class\\|inherit\\|from\\)\\>\\s-\\<\\(\\w*\\)\\>" 2 xbase-function-name-face)
-
-                               ;; #define constant name.
-                               (list "#[ \t]*define[ \t]+\\(\\sw+\\)" 1 xbase-variable-name-face)
-
-                               ;; Common constants.
+                                ;; "defun" function names.
+                                (list "\\<\\(function\\|procedure\\|method\\|access\\|assign\\|class\\|inherit\\|from\\)\\>\\s-\\<\\(\\w*\\)\\>" 2 xbase-function-name-face)
+                                
+                                ;; #define constant name.
+                                (list "#[ \t]*define[ \t]+\\(\\sw+\\)" 1 xbase-variable-name-face)
+                                
+                                ;; Common constants.
                                (list "\\(\\.\\(f\\|\\t\\)\\.\\|\\<\\(nil\\|self\\|super\\)\\>\\)" 0 xbase-constant-face)
-
+                               
                                )
-                              nil t))
+                               nil t))
   (set-syntax-table xbase-mode-syntax-table)
   (run-hooks 'xbase-mode-hook))
   
